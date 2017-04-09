@@ -5,14 +5,20 @@
 
 
 using namespace std;
-
 char draw[4][4]={{42,42,42,42},{42,42,42,42},{42,42,42,42},{42,42,42,42}};
-
 void status(int boomrow,int boomcolumn,int chooserow,int choosecol,int prompt,int times)
 {
     //draw[boomrow][boomcolumn]=66;    //B 顯示炸彈位置
 
-    draw[chooserow-1][choosecol-1]=prompt;  //48:0  49:1
+    int j,i;
+
+    if(times==1000)
+    {for(j=0;j<4;j++)
+       {for(i=0;i<4;i++)
+        {draw[j][i]=42;}}}
+
+    else
+    {draw[chooserow-1][choosecol-1]=prompt;}  //48:0  49:1
 
     cout<<" WELECOME 踩地雷!!! "<<endl;
     cout<<"=============="<<endl;
@@ -21,7 +27,8 @@ void status(int boomrow,int boomcolumn,int chooserow,int choosecol,int prompt,in
     cout<<"   "<<draw[2][0]<<" "<<draw[2][1]<<" "<<draw[2][2]<<" "<<draw[2][3]<<endl;
     cout<<"   "<<draw[3][0]<<" "<<draw[3][1]<<" "<<draw[3][2]<<" "<<draw[3][3]<<endl;
     cout<<"=============="<<endl;
-    cout<<"目前猜了"<<times<<"次"<<endl<<endl;
+    if(times!=1000)
+    {cout<<"目前猜了"<<times<<"次"<<endl<<endl;}
 }
 
 bool lazy()
@@ -47,6 +54,9 @@ bool lazy()
     return p;
 }
 
+
+
+
 int main()
 {   //column row
     int boomcolumn,boomrow;
@@ -54,21 +64,22 @@ int main()
     bool start;
     srand(time(NULL));
 
-
     do{
     start=true;
-    cout<<" WELECOME 踩地雷!!! "<<endl;
-    char draw[4][4]={{42,42,42,42},{42,42,42,42},{42,42,42,42},{42,42,42,42}};
-    cout<<"=============="<<endl;
-    cout<<"   "<<draw[0][0]<<" "<<draw[0][1]<<" "<<draw[0][2]<<" "<<draw[0][3]<<endl;
-    cout<<"   "<<draw[1][0]<<" "<<draw[1][1]<<" "<<draw[1][2]<<" "<<draw[1][3]<<endl;
-    cout<<"   "<<draw[2][0]<<" "<<draw[2][1]<<" "<<draw[2][2]<<" "<<draw[2][3]<<endl;
-    cout<<"   "<<draw[3][0]<<" "<<draw[3][1]<<" "<<draw[3][2]<<" "<<draw[3][3]<<endl;
-    cout<<"=============="<<endl<<endl;
     int playagain,times;
     boomrow=rand()%4;      //列
     boomcolumn=rand()%4;   //行
     times=0;
+
+    int i,j;   //reset
+    for(j=0;j<4;j++)
+    {
+      for(i=0;i<4;i++)
+      {draw[j][i]=42;}
+    }
+
+    //開始遊戲!
+    status(0,0,0,0,0,1000);  //RESET =>times=100
 
     // cout<<"boomrow 橫列= "<<boomrow+1<<endl;               //顯示炸彈位置
     // cout<<"boomcolumn 直行= "<<boomcolumn+1<<endl<<endl;
@@ -112,9 +123,10 @@ int main()
            inagain=true;
            cout<<"已踩過 "<<endl;
         }
-
         cin.ignore(1024,'\n'); //清buffer
        }while(inagain);
+
+
 
      int difrow,difcol; //差
      int prompt; //提示
@@ -164,6 +176,8 @@ int main()
         else
         {prompt=48;}  //ASCII=>'0'
 
+        draw[chooserow-1][choosecol-1]=prompt;
+
         if(j==0)  //boom!
         {
           cout<<"BOOM!!! BOOM!!! BOOM!!!"<<endl<<endl;
@@ -176,7 +190,7 @@ int main()
        {
            system("CLS");
            status(boomrow,boomcolumn,chooserow,choosecol,prompt,times);}
-      }
+       }
    }while(playagain);
    }while(start);
 }
