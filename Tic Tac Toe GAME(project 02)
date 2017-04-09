@@ -1,0 +1,139 @@
+#include <iostream>
+#include <windows.h>
+
+using namespace std;
+void status(char []);
+int cheak (char[]);
+
+void status(char ground[])
+{
+    cout<<endl<<"    Tic Tac Toe GAME !!"<<endl;
+    cout<<"-----------------------------"<<endl;
+    cout<<"  Player1: O  layer2: X "<<endl;
+    cout<<"-----------------------------"<<endl<<endl;
+
+    cout<<"      "<<ground[0]<<"  |  "<<ground[1]<<"  |  "<<ground[2]<<"  "<<endl;
+    cout<<"     --------------- "<<endl;
+    cout<<"      "<<ground[3]<<"  |  "<<ground[4]<<"  |  "<<ground[5]<<"  "<<endl;
+    cout<<"     --------------- "<<endl;
+    cout<<"      "<<ground[6]<<"  |  "<<ground[7]<<"  |  "<<ground[8]<<"  "<<endl;
+}
+
+int cheak(char ground[])
+{
+    if(ground[0]==ground[1] && ground[1]==ground[2])
+    {return 1;}
+    else if(ground[3]==ground[4] && ground[4]==ground[5])
+    {return 1;}
+    else if(ground[6]==ground[7] && ground[7]==ground[8])
+    {return 1;}
+    else if(ground[0]==ground[3] && ground[3]==ground[6])
+    {return 1;}
+    else if(ground[1]==ground[4] && ground[4]==ground[7])
+    {return 1;}
+    else if(ground[2]==ground[5] && ground[5]==ground[8])
+    {return 1;}
+    else if(ground[0]==ground[4] && ground[4]==ground[8])
+    {return 1;}
+    else if(ground[2]==ground[4] && ground[4]==ground[6])
+    {return 1;}
+    else if(ground[0]!=48 && ground[1]!=49 && ground[2]!=50 && ground[3]!=51 && ground[4]!=52 && ground[5]!=53 && ground[6]!=54 && ground[7]!=55 && ground[8]!=56)
+    {return 0;}
+}
+
+int main()
+{
+    char ground[9]={48,49,50,51,52,53,54,55,56};
+    int o,x,playagain,vs,enteragain;
+    //game start  //ascii x:88  o:79  1:49
+    status(ground);
+
+
+    do{
+    //vs=false;
+    enteragain=true;
+
+    while(enteragain)
+    {
+    cout<<endl<<"player1, enter a number :";
+    enteragain=false;
+    cin>>o;
+
+    if(!cin>>o||o>8||o<0||ground[o]==88||ground[o]==79)
+    {enteragain=true;
+    cin.clear();
+    cout<<"please enter again!"<<endl;}
+    cin.ignore(1000,'\n');
+    }
+
+    ground[o]=79;
+
+    system("CLS");
+    status(ground);
+
+
+    if(cheak(ground)==1) //win
+    {cout<<endl<<"player1 WIN!"<<endl<<endl;
+    enteragain=true;
+    vs=false;}
+    if(cheak(ground)==0) //draw
+    {cout<<endl<<"Game draw"<<endl;
+    enteragain=true;
+    vs=false;}
+
+
+    while(!enteragain)
+    {
+    cout<<endl<<"player2, enter a number :";
+    enteragain=true;
+    cin>>x;
+
+    if(!cin>>x||x>8||x<0||ground[x]==88||ground[x]==79)
+    {enteragain=false;
+    cin.clear();
+    cout<<"please enter again!"<<endl;}
+    cin.ignore(1000,'\n');
+    }
+
+    ground[x]=88;
+
+    if(vs)                   //還沒分出勝負的話
+    {system("CLS");
+    status(ground);
+
+    if(cheak(ground)==1) //win
+    {cout<<endl<<"player2 WIN!"<<endl<<endl;
+    vs=false;}}
+
+    bool cho;
+    int i;
+    if(!vs)
+    {
+        cout<<"Play again? 1.YES 2.NO "<<endl;
+
+        do
+        {cho=false;
+         cin>>playagain;
+
+         if(!cin>>playagain||playagain<1||playagain>2)
+         {cin.clear();
+          cout<<"please enter again!"<<endl;
+          cho=true;}
+          //cin.ignore(1000,'\n');
+
+         if(playagain==1)
+         {
+           vs=true;
+           system("CLS");
+           for(i=0;i<9;i++)
+           {ground[i]=(48+i);}
+           status(ground);
+         }
+
+         if(playagain==2)
+        {cout<<"GOODBYE!"<<endl;}
+        }while(cho);}
+    }while(vs);
+
+    return 0;
+}
