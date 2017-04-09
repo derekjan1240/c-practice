@@ -1,0 +1,182 @@
+#include <iostream>
+#include <stdlib.h>
+#include <cmath>
+#include <time.h>
+
+
+using namespace std;
+
+char draw[4][4]={{42,42,42,42},{42,42,42,42},{42,42,42,42},{42,42,42,42}};
+
+void status(int boomrow,int boomcolumn,int chooserow,int choosecol,int prompt,int times)
+{
+    //draw[boomrow][boomcolumn]=66;    //B 顯示炸彈位置
+
+    draw[chooserow-1][choosecol-1]=prompt;  //48:0  49:1
+
+    cout<<" WELECOME 踩地雷!!! "<<endl;
+    cout<<"=============="<<endl;
+    cout<<"   "<<draw[0][0]<<" "<<draw[0][1]<<" "<<draw[0][2]<<" "<<draw[0][3]<<endl;
+    cout<<"   "<<draw[1][0]<<" "<<draw[1][1]<<" "<<draw[1][2]<<" "<<draw[1][3]<<endl;
+    cout<<"   "<<draw[2][0]<<" "<<draw[2][1]<<" "<<draw[2][2]<<" "<<draw[2][3]<<endl;
+    cout<<"   "<<draw[3][0]<<" "<<draw[3][1]<<" "<<draw[3][2]<<" "<<draw[3][3]<<endl;
+    cout<<"=============="<<endl;
+    cout<<"目前猜了"<<times<<"次"<<endl<<endl;
+}
+
+bool lazy()
+{
+    int again,balala;
+    bool p;
+
+ do{
+    again=false;
+    cout<<endl<<"在玩一次? 1.YES 2.NO"<<endl;
+    cin>>balala;
+      if(balala==1)  //yes
+      {p=true;}
+      if(balala==2)  //no
+      {p=false;}
+      if(!cin>>balala||balala>2||balala<1)
+      {cin.clear();
+       again=true;
+       cout<<"輸入錯誤 !"<<endl;}
+       cin.ignore(1024,'\n');
+   }while(again);
+
+    return p;
+}
+
+int main()
+{   //column row
+    int boomcolumn,boomrow;
+    int chooserow,choosecol;
+    bool start;
+    srand(time(NULL));
+
+
+    do{
+    start=true;
+    cout<<" WELECOME 踩地雷!!! "<<endl;
+    char draw[4][4]={{42,42,42,42},{42,42,42,42},{42,42,42,42},{42,42,42,42}};
+    cout<<"=============="<<endl;
+    cout<<"   "<<draw[0][0]<<" "<<draw[0][1]<<" "<<draw[0][2]<<" "<<draw[0][3]<<endl;
+    cout<<"   "<<draw[1][0]<<" "<<draw[1][1]<<" "<<draw[1][2]<<" "<<draw[1][3]<<endl;
+    cout<<"   "<<draw[2][0]<<" "<<draw[2][1]<<" "<<draw[2][2]<<" "<<draw[2][3]<<endl;
+    cout<<"   "<<draw[3][0]<<" "<<draw[3][1]<<" "<<draw[3][2]<<" "<<draw[3][3]<<endl;
+    cout<<"=============="<<endl<<endl;
+    int playagain,times;
+    boomrow=rand()%4;      //列
+    boomcolumn=rand()%4;   //行
+    times=0;
+
+    // cout<<"boomrow 橫列= "<<boomrow+1<<endl;               //顯示炸彈位置
+    // cout<<"boomcolumn 直行= "<<boomcolumn+1<<endl<<endl;
+
+
+  do{
+     playagain=true;
+
+     int choose,inagain;
+     cout<<"1.我還不確定炸彈位置  2.我已經確定炸彈位置"<<endl;
+
+     do{
+        inagain=false;
+        cin>>choose;
+
+        if(!cin>>choose||choose<1||choose>2)
+        {   inagain=true;
+            cout<<"input is wrong"<<endl;
+            cin.clear();                    //清除狀態
+        }
+        cin.ignore(1024,'\n');          //清buffer
+
+        }while(inagain);
+
+     do{
+        inagain=false;
+        //cout<<endl;
+        cout<<"輸入列"<<" ";
+        cin>>chooserow;
+        cout<<"輸入行"<<" ";
+        cin>>choosecol;
+
+        if(!cin>>chooserow||!cin>>choosecol||chooserow>4||chooserow<1||choosecol>4||choosecol<1)  //輸入類型錯誤
+         {  inagain=true;
+            cout<<"輸入錯誤"<<endl;
+            cin.clear();        //清除狀態
+         }
+
+        if(draw[chooserow-1][choosecol-1]==49||draw[chooserow-1][choosecol-1]==48)    //重複輸入 49=1 48=0
+        {
+           inagain=true;
+           cout<<"已踩過 "<<endl;
+        }
+
+        cin.ignore(1024,'\n'); //清buffer
+       }while(inagain);
+
+     int difrow,difcol; //差
+     int prompt; //提示
+
+      difrow=(chooserow-1)-boomrow;
+      difcol=(choosecol-1)-boomcolumn;
+
+      if(choose==2)
+      {
+        if(difrow==0&&difcol==0)
+        {
+          system("CLS");
+          cout<<"YOU WIN!!!"<<endl;
+          cout<<"共猜了"<<times+1<<"次"<<endl;
+          start=lazy();
+          system("CLS");
+          playagain=false; //這次遊戲
+        }
+        else
+        {
+          cout<<"YOU ARE WRONG!!!"<<endl;
+          cout<<"BOOM!!! BOOM!!! BOOM!!!"<<endl<<endl;
+          cout<<"YOU LOSE!!!"<<endl<<endl;
+
+          cout<<"炸彈正確位置= "<<boomrow+1<<"列"<<boomcolumn+1<<"行"<<endl;  //顯示炸彈位置
+          start=lazy();
+          system("CLS");
+          playagain=false;
+        }
+
+      }
+      if(choose==1)
+      {
+        int j,nextboom;
+        times++;                   //猜次數
+        j=abs(difrow)+abs(difcol); //行列差總和
+
+        //判斷提示
+        if(j<3)
+        {nextboom=true;}
+        if( (abs(difrow)==0&&abs(difcol)==2)||(abs(difrow)==2&&abs(difcol)==0)||j>2)
+        {nextboom=false;}
+
+
+        if(nextboom)
+        {prompt=49;}  //ASCII=>'1'
+        else
+        {prompt=48;}  //ASCII=>'0'
+
+        if(j==0)  //boom!
+        {
+          cout<<"BOOM!!! BOOM!!! BOOM!!!"<<endl<<endl;
+          cout<<"YOU LOSE!!!"<<endl;
+          start=lazy();
+          system("CLS");
+          playagain=false;
+        }
+       if(playagain==true)
+       {
+           system("CLS");
+           status(boomrow,boomcolumn,chooserow,choosecol,prompt,times);}
+      }
+   }while(playagain);
+   }while(start);
+}
