@@ -7,7 +7,7 @@
 ### EXE 畫面
 完成後補充...
 </br></hr></br>
-## Tic Tac Toe GAME(project 02)
+## Project 02 Tic Tac Toe GAME(圈圈叉叉)
 ### About
 2017.4.10</br>
 圈圈叉叉
