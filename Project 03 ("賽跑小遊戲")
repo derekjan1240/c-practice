@@ -1,0 +1,171 @@
+#include <iostream>
+#include <windows.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <time.h>
+
+using namespace std;
+
+void dis(char background[11][23],bool play);
+void result(int py);
+
+int main()
+{
+    char background[11][23]={};
+    char run1,run2;
+    bool play,again;
+    int  j,i,py,cy,comspeed,cheakstart,difficult;
+
+do{
+    cout << "==================================" <<endl;
+    cout << " 輪流按下 A鍵 D鍵  車子將會向前進"<<endl;
+    cout << " 選擇難度 開始遊戲 ! (玩家A 電腦B)"<<endl;
+    cout << " 1.簡單   2.正常   3.困難         "<<endl;
+    cout << "==================================" <<endl<<endl;
+
+       for(j=0;j<11;j++)
+       {
+           for(i=0;i<23;i++)
+           {
+               background[j][i]= 32;
+           }
+       }
+
+       //--- set 起跑位置 ---
+    py=10,cy=10;
+    background[py][6]=65;   //player 'A'
+    background[cy][17]=66;  //computer 'B'
+       //---------------
+
+    play=false;
+    dis(background,play);
+
+       do{cheakstart = getche(); //選難度
+           if(cheakstart=='1')  //easy
+           {play=true;
+           difficult=800;}
+           if(cheakstart=='2')  //n
+           {play=true;
+           difficult=100;}
+           if(cheakstart=='3')  //d
+           {play=true;
+           difficult=30;}
+         }while(!play);
+
+    cout<<endl<<"    Ready... ";
+    Sleep(1000);
+    cout<<"Go!!!"<<endl;
+
+    while(play)
+    {
+        dis(background,play);
+
+        srand(time(NULL));
+        comspeed=(rand()%2);  //0,1
+        clock_t t;
+
+        t = clock();
+        run1 = getche();
+        cout<<" ";
+        run2 = getche();
+        cout<<" ";
+        t = clock()-t;
+
+       // cout<<endl<<"clock= "<<t<<endl;
+       // cout<<"comspeed= "<<comspeed<<endl;
+
+
+        int commove;
+
+        if(t>difficult)
+        {
+            commove=t-difficult;
+            if(commove>3)
+            {commove=3;} //一次最多移3格
+            background[cy][17]=32;
+            cy=cy-commove;
+            background[cy][17]=66;
+        }
+
+        else
+        {
+            background[cy][17]=32;
+            cy=cy-comspeed;
+            background[cy][17]=66;
+        }
+
+        if((run1=='a' ||run1=='A')&& (run2=='d'||run2=='D'))
+        {
+            background[py][6]=32;
+            py--;
+            background[py][6]=65;
+        }
+
+        dis(background,play);
+
+        if(py<0||cy<0)//over
+        {play = false;}
+    }
+
+    result(py);
+    system("CLS");
+    char againchoose;
+
+    cout<<endl<<endl<<"再玩一次?  <Y/N>"<<endl;
+
+        cin.clear();
+        againchoose=getche();
+
+        if(againchoose== 'Y'||againchoose== 'y')
+        {
+            again=true;
+        }
+
+        else
+        {
+            again=false;
+            cout<<"GOODBYE ~ ~ ~"<<endl;
+        }
+
+     system("CLS");
+
+}while(again);
+    return 0;
+}
+
+void dis(char background[11][23],bool play)   //display
+{
+
+    int i,k;
+
+    if(play)
+    {system("CLS");}
+
+    cout <<"        =RUN RUN RUN= "<<endl;
+
+    cout<<"   -------- GOAL -----------"<<endl;
+    cout<<"   -------------------------"<<endl;
+    for(i=0;i<11;i++)
+    {
+       cout<<"   |";
+       for(k=0;k<23;k++)
+       {
+          cout<<background[i][k];
+          if(k==22)
+          {cout<<"|"<<endl;}
+       }
+    }
+    cout<<"   -------------------------"<<endl;
+    cout<<"   -------- START ----------"<<endl;
+}
+
+void result(int py)   //輸贏
+{
+    cout<<endl<<"   ====== GAME OVER ======"<<endl;
+    if(py<0)
+    {cout<<"          YOU WIN !!";}
+    else
+    {cout<<"         YOU LOSE !!";}
+    cout<<endl<<"   ======================="<<endl;
+    Sleep(2500);
+}
