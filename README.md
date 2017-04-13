@@ -24,3 +24,12 @@
 ### EXE 影片
 有時間再補充..
 (https://drive.google.com/open?id=0BwkhHFKY-I0nUXUyMU1oVFYtT0U)
+
+</br></hr></br>
+## Project 04 ("貪食蛇")
+### About
+2017.4.14</br>
+gotoxy()練習 (繪圖) + kbhit()練習 (非同步)
+### EXE 影片
+有時間再補充..
+(https://drive.google.com/open?id=0BwkhHFKY-I0nSGtRNWIzdzYxTW8)
