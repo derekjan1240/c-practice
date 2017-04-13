@@ -23,7 +23,7 @@ int main()
 do{
     srand(time(NULL));
     int x,y,candy_x,candy_y,speed,lastdir=1,body=1,score=0,walktime=0; //snake,candy
-    int snaketailx[100000]={};  //¤§«á­n§ïvetor !!
+    int snaketailx[100000]={};  //ä¹‹å¾Œè¦æ”¹vetor !!
     int snaketaily[100000]={};
 
     bool play,eat,up,down,left,right;
@@ -33,7 +33,7 @@ do{
     right=true; //start
     play=true;
     eat=false;
-    x=25,y=10; //¥Xµo¦ì¸m
+    x=25,y=10; //å‡ºç™¼ä½ç½®
 
     candy_x=rand()%49+1;
     candy_y=rand()%19+1;
@@ -99,16 +99,16 @@ do{
          }
 
 
-         Sleep(speed);//³t«×±±¨î
+         Sleep(speed);//é€Ÿåº¦æ§åˆ¶
        }
 
        else
       {
-       changedir = getch();  //¿é¤J¤è¦V
+       changedir = getch();  //è¼¸å…¥æ–¹å‘
 
        if((changedir=='d'||changedir=='D') && lastdir!=3 )
        {
-           lastdir=1;//­ì¥»¤è¦V 1:d 2:w 3:a 4:s
+           lastdir=1;//åŸæœ¬æ–¹å‘ 1:d 2:w 3:a 4:s
            right=true,left=false,up=false,down=false;
        }
 
