@@ -1,11 +1,12 @@
 # c++ practice
 
-## Project 01 "踩地雷"(簡易版)
+## Project 01 "踩地雷"
 ### About
-2017.4.9</br>
+2017.4.9 / 2017.6.17</br>
 矩陣練習(圖像化)
 ### EXE 影片
 完成後補充...
+(https://drive.google.com/open?id=0BwkhHFKY-I0naVpKbnI4eUxVcjQ)
 
 </br></hr></br>
 ## Project 02 Tic Tac Toe GAME(圈圈叉叉)
