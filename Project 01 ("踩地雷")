@@ -1,196 +1,474 @@
 #include <iostream>
-#include <stdlib.h>
-#include <cmath>
+#include <conio.h>
+#include <string>
+#include <windows.h>
+#include <vector>
 #include <time.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
-char draw[4][4]={{42,42,42,42},{42,42,42,42},{42,42,42,42},{42,42,42,42}};
-void status(int boomrow,int boomcolumn,int chooserow,int choosecol,int prompt,int times)
-{
-    //draw[boomrow][boomcolumn]=66;    //B 顯示炸彈位置
 
-    int j,i;
+void wall(void);
+void reset();
+int GetPlayer_Number(void);
+int GetGame_Menu(void);
+int GetHint(int,int,int,int,bool);
+void vectorset(int,int);
+void InitialSeting_Display(int,int);
+void GroundMap_Display(int,int);
+void SetBomb(int,int,int);
+void PlayGame(int,int,int);
+string GetPlayer_Name(void);
 
-    if(times==1000)
-    {for(j=0;j<4;j++)
-       {for(i=0;i<4;i++)
-        {draw[j][i]=42;}}}
-
-    else
-    {draw[chooserow-1][choosecol-1]=prompt;}  //48:0  49:1
-
-    cout<<" WELECOME 踩地雷!!! "<<endl;
-    cout<<"=============="<<endl;
-    cout<<"   "<<draw[0][0]<<" "<<draw[0][1]<<" "<<draw[0][2]<<" "<<draw[0][3]<<endl;
-    cout<<"   "<<draw[1][0]<<" "<<draw[1][1]<<" "<<draw[1][2]<<" "<<draw[1][3]<<endl;
-    cout<<"   "<<draw[2][0]<<" "<<draw[2][1]<<" "<<draw[2][2]<<" "<<draw[2][3]<<endl;
-    cout<<"   "<<draw[3][0]<<" "<<draw[3][1]<<" "<<draw[3][2]<<" "<<draw[3][3]<<endl;
-    cout<<"=============="<<endl;
-    if(times!=1000)
-    {cout<<"目前猜了"<<times<<"次"<<endl<<endl;}
-}
-
-bool lazy()
-{
-    int again,balala;
-    bool p;
-
- do{
-    again=false;
-    cout<<endl<<"在玩一次? 1.YES 2.NO"<<endl;
-    cin>>balala;
-      if(balala==1)  //yes
-      {p=true;}
-      if(balala==2)  //no
-      {p=false;}
-      if(!cin>>balala||balala>2||balala<1)
-      {cin.clear();
-       again=true;
-       cout<<"輸入錯誤 !"<<endl;}
-       cin.ignore(1024,'\n');
-   }while(again);
-
-    return p;
-}
-
-
+char groundmap [12][12];
+vector<bool> cheakalready;
+vector<char> col;
+vector< vector<char> > GroundMap;
+vector<int> bomb;
+int rowlong,collong,bombnumber;
 
 
 int main()
-{   //column row
-    int boomcolumn,boomrow;
-    int chooserow,choosecol;
-    bool start;
-    srand(time(NULL));
+{
+    bool game=1;
+    char playagainchoose;
 
-    do{
-    start=true;
-    int playagain,times;
-    boomrow=rand()%4;      //列
-    boomcolumn=rand()%4;   //行
-    times=0;
+    wall();
 
-    int i,j;   //reset
-    for(j=0;j<4;j++)
+    while(game)
     {
-      for(i=0;i<4;i++)
-      {draw[j][i]=42;}
+       reset();
+       cout << " Welecome Minesweeper! " << endl<< endl;
+
+       //playernumberset
+       int playernumber = GetPlayer_Number();
+       //difficultset
+       int difficultchoose = GetGame_Menu();
+       //display
+       InitialSeting_Display(playernumber,difficultchoose);
+
+       if(difficultchoose==4)  //自訂setting
+       {
+           while(1)
+           {
+               cout<<"COL(直行 MAX:30) : ";
+               cin>>collong;
+               cout<<"ROW(橫列 MAX:20) : ";
+               cin>>rowlong;
+               cout<<"Bombnumber : ";
+               cin>>bombnumber;
+
+               if(collong<1 || collong>30 || rowlong<1 || rowlong>20 || bombnumber<1 ||bombnumber>=(collong*rowlong))
+               {cout<<"輸入有誤"<<endl<<endl;}
+               else
+               {break;}
+           }
+       }
+       else
+       {rowlong=10,collong=10,bombnumber=difficultchoose*10;}
+
+       vectorset(rowlong,collong);
+       Sleep(1000);
+       system("CLS");
+
+      // GroundMap_Display(rowlong,collong);
+
+       //game start
+       SetBomb(rowlong,collong,bombnumber);
+       PlayGame(rowlong,collong,bombnumber);
+
+       //Again?
+       while(1)
+       {
+           cout<<endl<<"PLAY AGAIN ?  (Y/N) :";
+           playagainchoose= getche();
+
+           if(playagainchoose=='n' || playagainchoose=='N')
+           {
+               game=0;
+               break;
+           }
+           else if(playagainchoose=='y' || playagainchoose=='Y')
+           {
+               reset();
+               break;
+           }
+       }
+
+       Sleep(500);
+       system("CLS");
     }
 
-    //開始遊戲!
-    status(0,0,0,0,0,1000);  //RESET =>times=100
+    cout<<"Bye";
 
-    // cout<<"boomrow 橫列= "<<boomrow+1<<endl;               //顯示炸彈位置
-    // cout<<"boomcolumn 直行= "<<boomcolumn+1<<endl<<endl;
-
-
-  do{
-     playagain=true;
-
-     int choose,inagain;
-     cout<<"1.我還不確定炸彈位置  2.我已經確定炸彈位置"<<endl;
-
-     do{
-        inagain=false;
-        cin>>choose;
-
-        if(!cin>>choose||choose<1||choose>2)
-        {   inagain=true;
-            cout<<"input is wrong"<<endl;
-            cin.clear();                    //清除狀態
-        }
-        cin.ignore(1024,'\n');          //清buffer
-
-        }while(inagain);
-
-     do{
-        inagain=false;
-        //cout<<endl;
-        cout<<"輸入列"<<" ";
-        cin>>chooserow;
-        cout<<"輸入行"<<" ";
-        cin>>choosecol;
-
-        if(!cin>>chooserow||!cin>>choosecol||chooserow>4||chooserow<1||choosecol>4||choosecol<1)  //輸入類型錯誤
-         {  inagain=true;
-            cout<<"輸入錯誤"<<endl;
-            cin.clear();        //清除狀態
-         }
-
-        if(draw[chooserow-1][choosecol-1]==49||draw[chooserow-1][choosecol-1]==48)    //重複輸入 49=1 48=0
-        {
-           inagain=true;
-           cout<<"已踩過 "<<endl;
-        }
-        cin.ignore(1024,'\n'); //清buffer
-       }while(inagain);
-
-
-
-     int difrow,difcol; //差
-     int prompt; //提示
-
-      difrow=(chooserow-1)-boomrow;
-      difcol=(choosecol-1)-boomcolumn;
-
-      if(choose==2)
-      {
-        if(difrow==0&&difcol==0)
-        {
-          system("CLS");
-          cout<<"YOU WIN!!!"<<endl;
-          cout<<"共猜了"<<times+1<<"次"<<endl;
-          start=lazy();
-          system("CLS");
-          playagain=false; //這次遊戲
-        }
-        else
-        {
-          cout<<"YOU ARE WRONG!!!"<<endl;
-          cout<<"BOOM!!! BOOM!!! BOOM!!!"<<endl<<endl;
-          cout<<"YOU LOSE!!!"<<endl<<endl;
-
-          cout<<"炸彈正確位置= "<<boomrow+1<<"列"<<boomcolumn+1<<"行"<<endl;  //顯示炸彈位置
-          start=lazy();
-          system("CLS");
-          playagain=false;
-        }
-
-      }
-      if(choose==1)
-      {
-        int j,nextboom;
-        times++;                   //猜次數
-        j=abs(difrow)+abs(difcol); //行列差總和
-
-        //判斷提示
-        if(j<3)
-        {nextboom=true;}
-        if( (abs(difrow)==0&&abs(difcol)==2)||(abs(difrow)==2&&abs(difcol)==0)||j>2)
-        {nextboom=false;}
-
-
-        if(nextboom)
-        {prompt=49;}  //ASCII=>'1'
-        else
-        {prompt=48;}  //ASCII=>'0'
-
-        draw[chooserow-1][choosecol-1]=prompt;
-
-        if(j==0)  //boom!
-        {
-          cout<<"BOOM!!! BOOM!!! BOOM!!!"<<endl<<endl;
-          cout<<"YOU LOSE!!!"<<endl;
-          start=lazy();
-          system("CLS");
-          playagain=false;
-        }
-       if(playagain==true)
-       {
-           system("CLS");
-           status(boomrow,boomcolumn,chooserow,choosecol,prompt,times);}
-       }
-   }while(playagain);
-   }while(start);
+    return 0;
 }
+
+void reset()
+{
+    vectorset(10,10);
+    bomb.assign(10,0);
+}
+
+void PlayGame(int rowlong,int collong,int bombnumber)  //rowlong => y, collong => x
+{
+    char key,tem=42;
+    int position_x =1,position_y =1;  //ex. (1,1) (10,10)
+    int flagnumber=bombnumber;
+    int stepnumber=(rowlong*collong)-bombnumber;
+    int hintnumber;
+    bool boom=0;
+
+    while(1)
+    {
+        cout<<"Flag: "<<flagnumber<<"  Step: "<<stepnumber<<endl;
+
+        //test showbomb
+        /*
+        for(int showbomb=0;showbomb<bombnumber;showbomb++)
+        {
+            cout<<bomb[showbomb]<<" ";
+            if((showbomb%10==0) && showbomb!=0)
+            {cout<<endl;}
+        }*/
+
+        GroundMap[position_y][position_x]=tem;
+
+        if (kbhit()>0)  //如果按下
+        {
+            // control key
+            key = getch();
+
+            if((key=='a'||key=='A') && position_x>1)
+            {position_x--;}
+            else if((key=='d'||key=='D') && position_x<collong)
+            {position_x++;}
+            else if((key=='w'||key=='W') && position_y>1)
+            {position_y--;}
+            else if((key=='s'||key=='S') && position_y<rowlong)
+            {position_y++;}
+
+            //control footset
+            else if((key=='f'||key=='F') && (GroundMap[position_y][position_x]==42||GroundMap[position_y][position_x]==80))  // set flag
+            {
+                if(GroundMap[position_y][position_x]==80)
+                {
+                    GroundMap[position_y][position_x]=42;
+                    flagnumber++;
+                }
+                else if(flagnumber>0)
+                {
+                    GroundMap[position_y][position_x]=80;
+                    flagnumber--;
+                }
+            }
+            else if((key=='g'||key=='G') && stepnumber>0 && GroundMap[position_y][position_x]==42)  //踩地雷
+            {
+                stepnumber--;
+                hintnumber = GetHint(position_y,position_x,rowlong,collong,0);
+
+                /*if(hintnumber==0) //boom
+                {
+                    stepnumber++;
+                }*/
+
+                if(hintnumber==10) //boom
+                {
+                    boom=1;
+                }
+                else
+                {GroundMap[position_y][position_x]=hintnumber+48;}
+            }
+
+            tem = GroundMap[position_y][position_x];
+        }
+        else
+        {
+            tem = GroundMap[position_y][position_x];
+            GroundMap[position_y][position_x]=32;
+
+        }
+        //all ground 0 cheak
+
+        /*int countt=0;
+        for(int l=collong+2;countt<rowlong;l+=(collong+2))
+        {
+            countt++;
+            cheakalready[l]=1;
+            cheakalready[l+1+collong]=1;
+        }*/
+
+        for(int cheakcounty=1;cheakcounty<(rowlong+1);cheakcounty++)
+        {
+            for(int cheakcountx=1;cheakcountx<(collong+1);cheakcountx++)
+            {
+                int footnumber = cheakcounty*(collong+2)+cheakcountx;
+
+                if(GroundMap[cheakcounty][cheakcountx]=='0' && cheakalready[footnumber]==0)
+                {
+                    cheakalready[footnumber]=1;
+
+                    //四周 hintnimber
+                    int cheakzero[8];
+                    cheakzero[0] = GetHint(cheakcounty+1,cheakcountx-1,rowlong,collong,1);
+                    cheakzero[1] = GetHint(cheakcounty+1,cheakcountx,rowlong,collong,1);
+                    cheakzero[2] = GetHint(cheakcounty+1,cheakcountx+1,rowlong,collong,1);
+                    cheakzero[3] = GetHint(cheakcounty,cheakcountx-1,rowlong,collong,1);
+                    cheakzero[4] = GetHint(cheakcounty,cheakcountx+1,rowlong,collong,1);
+                    cheakzero[5] = GetHint(cheakcounty-1,cheakcountx-1,rowlong,collong,1);
+                    cheakzero[6] = GetHint(cheakcounty-1,cheakcountx,rowlong,collong,1);
+                    cheakzero[7] = GetHint(cheakcounty-1,cheakcountx+1,rowlong,collong,1);
+
+                    for(int p=0;p<8;p++)
+                    {
+                            if(p==0 && cheakcountx>1 && cheakcounty<rowlong && GroundMap[cheakcounty+1][cheakcountx-1]==42 && cheakzero[p]<10)
+                            {GroundMap[cheakcounty+1][cheakcountx-1]=cheakzero[p]+48,stepnumber--;}
+
+                            if(p==1 && cheakcounty<rowlong && GroundMap[cheakcounty+1][cheakcountx]==42 && cheakzero[p]<10)
+                            {GroundMap[cheakcounty+1][cheakcountx]=cheakzero[p]+48,stepnumber--;}
+
+                            if(p==2 && cheakcountx<collong && cheakcounty<rowlong && GroundMap[cheakcounty+1][cheakcountx+1]==42&& cheakzero[p]<10)
+                            {GroundMap[cheakcounty+1][cheakcountx+1]=cheakzero[p]+48,stepnumber--;}
+
+                            if(p==3 && cheakcountx>1 &&GroundMap[cheakcounty][cheakcountx-1]==42 && cheakzero[p]<10)
+                            {GroundMap[cheakcounty][cheakcountx-1]=cheakzero[p]+48,stepnumber--;}
+
+                            if(p==4 && cheakcountx<collong && GroundMap[cheakcounty][cheakcountx+1]==42 && cheakzero[p]<10)
+                            {GroundMap[cheakcounty][cheakcountx+1]=cheakzero[p]+48,stepnumber--;}
+
+                            if(p==5 && cheakcountx>1 && cheakcounty>1 && GroundMap[cheakcounty-1][cheakcountx-1]==42 && cheakzero[p]<10)
+                            {GroundMap[cheakcounty-1][cheakcountx-1]=cheakzero[p]+48,stepnumber--;}
+
+                            if(p==6 && cheakcounty>1 && GroundMap[cheakcounty-1][cheakcountx]==42 && cheakzero[p]<10)
+                            {GroundMap[cheakcounty-1][cheakcountx]=cheakzero[p]+48,stepnumber--;}
+
+                            if(p==7 && cheakcountx<collong && cheakcounty>1 && GroundMap[cheakcounty-1][cheakcountx+1]==42 && cheakzero[p]<10)
+                            {GroundMap[cheakcounty-1][cheakcountx+1]=cheakzero[p]+48,stepnumber--;}
+                    }
+                }
+            }
+        }
+
+
+        //win & lose
+        if(boom==1)
+        {
+            system("CLS");
+            cout<<"BOOM!!!"<<endl<<endl<<"YOU LOSE!"<<endl;
+            break;
+        }
+        else if(stepnumber==0)
+        {
+            system("CLS");
+            cout<<"Yeah!!!"<<endl<<endl<<"YOU WIN!"<<endl;
+            break;
+        }
+        GroundMap_Display(rowlong,collong);
+    }
+}
+
+void SetBomb(int rowlong,int collong,int bombnumber)
+{
+    int bombsrand,tembombsrand;
+    int linecol,linerow;
+    srand( unsigned(time(NULL) ));
+
+    bomb.assign(bombnumber,0);
+
+    linecol=rand()%collong+1;
+    linerow=rand()%rowlong+1;
+    bombsrand=linerow*(collong+2)+linecol;
+    bomb[0]=bombsrand;
+
+    for(int k=1;k<bombnumber;k++)  //產生炸彈
+    {
+        linecol=rand()%collong+1;
+        linerow=rand()%rowlong+1;
+        bombsrand=linerow*(collong+2)+linecol;
+
+        if(bombsrand > bomb[k-1]) //比前一大
+        {
+            bomb[k]=bombsrand;
+        }
+        else if(bombsrand == bomb[k-1]) //一樣大
+        {
+            k--;
+        }
+        else // 比前一小
+        {
+            if(k==1)
+            {
+                tembombsrand = bomb[0];
+                bomb[0]= bombsrand;
+                bomb[1]= tembombsrand;
+            }
+
+            for(int j=k-2;j>=0;j--)
+            {
+                if(bombsrand>bomb[j]) // 大於 結束排序
+                {
+                    for(int i=j+1;i<=k;i++)
+                    {
+                      tembombsrand = bomb[i];
+                      bomb[i]=bombsrand;
+                      bombsrand = tembombsrand;
+                    }
+                    break;
+                }
+
+                else if(bombsrand == bomb[j])  //等於
+                {
+                    k--;
+                    break;
+                }
+
+                else if(j==0) //最小
+                {
+                    for(int w=k;w>0;w--)
+                    {bomb[w]=bomb[w-1];}
+                    bomb[0]= bombsrand;
+                }
+            }
+        }
+    }
+}
+
+void vectorset(int rowlong,int collong)
+{
+    col.assign(collong+2,42);          //配置一個row的大小
+    GroundMap.assign(rowlong+2,col);   //配置2維
+
+    cheakalready.assign((rowlong+2)*(collong+2),0);
+}
+
+void GroundMap_Display(int rowlong,int collong) //x-axis y-axis
+{
+    cout<<endl<<"-------------------------"<<endl;
+    for(int i=1;i<=rowlong;i++)
+    {
+        cout<<i<<" ";
+        if(i<10)
+        {cout<<" ";}
+
+        for(int j=1;j<=collong;j++)
+        {cout<<GroundMap[i][j]<<" ";}
+        cout<<endl;
+    }
+    cout<<"-------------------------";
+
+    Sleep(500);
+    system("CLS");
+}
+
+void InitialSeting_Display(int playernumber,int difficultchoose)
+{
+    cout<<endl;
+    wall();
+    cout<<"玩家人數: "<<playernumber-48<<endl;
+    cout<<"你選擇的難度為: ";
+
+    if(difficultchoose==1)
+    {
+        cout<<"EASY"<<endl<<"總格數100 炸彈數 10";
+    }
+    else if(difficultchoose==2)
+    {
+        cout<<"NORMAL"<<endl<<"總格數100 炸彈數 20";
+    }
+    else if(difficultchoose==3)
+    {
+        cout<<"HARD"<<endl<<"總格數100 炸彈數 30";
+    }
+    else if(difficultchoose==4)
+    {
+        //cus setting
+        cout<<"CUSTOM"<<endl<<"請輸入資訊 :"<<endl;
+    }
+    wall();
+}
+
+int GetPlayer_Number()
+{
+    char playernumberchoose;
+
+    while(1)
+    {
+        do{
+            cout << "選擇玩家數目(MAX:2):";
+            playernumberchoose = getche();
+
+            if(playernumberchoose<49 || playernumberchoose>50)
+            {
+                cout << "  輸入錯誤 ! " << endl;
+            }
+
+        }while(playernumberchoose<49 || playernumberchoose>50);
+
+        cout<<endl;
+        return playernumberchoose;
+    }
+}
+
+int GetGame_Menu()
+{
+    char difficultchoose;
+
+    while(1)
+    {
+        cout << "選擇難度:  A.EASY  B.NORMAL  C.HARD  D.CUSTOM   ";
+        difficultchoose = getche();
+
+        if(difficultchoose=='a'||difficultchoose=='A')
+        {return 1;}
+
+        else if(difficultchoose=='b'||difficultchoose=='B')
+        {return 2;}
+
+        else if(difficultchoose=='c'||difficultchoose=='C')
+        {return 3;}
+
+        else if(difficultchoose=='d'||difficultchoose=='D')
+        {return 4;}
+
+        else
+        {cout << "輸入錯誤 ! "<< endl;}
+    }
+}
+
+int GetHint(int position_y,int position_x,int rowlong,int collong,bool doublecheak)
+{
+    int foot=position_y*(collong+2)+position_x;
+    int hintnumber=0;
+    int cheak[8];
+
+    cheak[0]=foot-1-(collong+2);
+    cheak[1]=foot-(collong+2);
+    cheak[2]=foot+1-(collong+2);
+    cheak[3]=foot-1;
+    cheak[4]=foot+1;
+    cheak[5]=foot-1+(collong+2);
+    cheak[6]=foot+(collong+2);
+    cheak[7]=foot+1+(collong+2);
+
+        for(int i=0;i<bomb.size();i++)
+        {
+            for(int h=0;h<8;h++)
+            {
+               if(bomb[i]==cheak[h])
+               {hintnumber++;}
+
+               else if(bomb[i]==foot && doublecheak==0) //boom
+               {return 10;}
+            }
+        }
+
+    return hintnumber;
+}
+
+void wall()
+{
+    cout<<endl<<"---------------------------------------"<<endl;
+}
+
+
